@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+python-dotenv
+httpx
+PyJWT
+PyMuPDF
+pydantic
+langchain-google-genai
+faiss-cpu
+langchain
+gunicorn

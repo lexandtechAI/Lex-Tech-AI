@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.markdown-content {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  white-space: normal;
+}
