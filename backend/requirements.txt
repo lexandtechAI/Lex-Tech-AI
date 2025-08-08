@@ -10,3 +10,4 @@ faiss-cpu
 langchain
 gunicorn
 langchain-community
+supabase
