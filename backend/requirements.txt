@@ -9,3 +9,4 @@ langchain-google-genai
 faiss-cpu
 langchain
 gunicorn
+langchain-community
