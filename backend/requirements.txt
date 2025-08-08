@@ -11,3 +11,4 @@ langchain
 gunicorn
 langchain-community
 supabase
+python-multipart
