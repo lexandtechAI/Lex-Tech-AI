@@ -157,15 +157,24 @@ app.include_router(auth_router)
 origins = [
     "http://localhost:3000",  # For local development
 ]
+# --- START CORS DEBUG LOGGING ----
+print("--- Initializing CORS Configuration ---")
 # Get the deployed frontend URL from an environment variable
 frontend_url = os.getenv("FRONTEND_URL")
+print(f"Value of FRONTEND_URL from environment: '{frontend_url}'")
 if frontend_url:
+    print("FRONTEND_URL is set, adding to origins.")
     origins.append(frontend_url)
 
 # Allow Render preview URLs
 render_external_url = os.getenv("RENDER_EXTERNAL_URL")
+print(f"Value of RENDER_EXTERNAL_URL from environment: '{render_external_url}'")
 if render_external_url:
+    print("RENDER_EXTERNAL_URL is set, adding to origins.")
     origins.append(render_external_url)
+
+print(f"--- Final list of allowed origins for CORS: {origins} ---")
+# --- END CORS DEBUG LOGGING ---
 
 app.add_middleware(
     CORSMiddleware,
