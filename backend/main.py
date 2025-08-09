@@ -24,6 +24,8 @@ from langchain.memory import ConversationBufferWindowMemory
 from langchain.retrievers import ContextualCompressionRetriever
 from langchain.retrievers.document_compressors import EmbeddingsFilter
 from langchain.schema import HumanMessage, AIMessage
+from langchain_community.document_loaders import DirectoryLoader, PyPDFLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from collections import defaultdict
 from datetime import datetime, timezone
 
@@ -57,12 +59,64 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 os.environ["GOOGLE_API_KEY"] = os.getenv("GOOGLE_API_KEY")
 
 # ------------------ Embeddings & Vector Store ------------------
+
+# Initialize Google Generative AI embeddings
 embeddings = GoogleGenerativeAIEmbeddings(
-    model="models/embedding-001", google_api_key=os.environ["GOOGLE_API_KEY"]
+    model="models/embedding-001",
+    google_api_key=os.environ["GOOGLE_API_KEY"]
 )
-# NOTE: Before deploying, you must upload your pre-built 'my_index' folder
-# to the root of your Render Disk.
-db = FAISS.load_local(FAISS_INDEX_PATH, embeddings, allow_dangerous_deserialization=True)
+
+# Check if the FAISS index already exists
+if os.path.exists(FAISS_INDEX_PATH):
+    print("✅ Loading existing FAISS index from disk...")
+    db = FAISS.load_local(
+        FAISS_INDEX_PATH,
+        embeddings,
+        allow_dangerous_deserialization=True
+    )
+else:
+    print("⚠️ No FAISS index found. Building new index from source documents...")
+    print("This will only happen once and may take a few minutes.")
+
+    # Path to source documents on persistent disk
+    SOURCE_DOCS_PATH = os.path.join(DATA_DIR, "source_documents")
+
+    if not os.path.exists(SOURCE_DOCS_PATH) or not os.listdir(SOURCE_DOCS_PATH):
+        raise Exception(
+            f"Source documents folder not found or is empty: {SOURCE_DOCS_PATH}. "
+            "Please upload your documents first."
+        )
+
+    # Load documents from directory
+    loader = DirectoryLoader(
+        SOURCE_DOCS_PATH,
+        glob="**/*.pdf",  # Load all PDF files in subdirectories
+        loader_cls=PyPDFLoader,
+        show_progress=True,
+        use_multithreading=True
+    )
+
+    print("📚 Loading documents...")
+    documents = loader.load()
+
+    # Split documents into smaller chunks for processing
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=1000,
+        chunk_overlap=200
+    )
+    print("✂️ Splitting documents into chunks...")
+    texts = text_splitter.split_documents(documents)
+
+    # Create FAISS index from document chunks
+    print("🧠 Building FAISS index... (This is the slow part)")
+    db = FAISS.from_documents(texts, embeddings)
+
+    # Save newly created index for future use
+    print(f"💾 Saving new index to {FAISS_INDEX_PATH}")
+    db.save_local(FAISS_INDEX_PATH)
+    print("✅ New FAISS index built and saved successfully!")
+
+
 
 # ------------------ Retriever Setup ------------------
 base_retriever = db.as_retriever(search_kwargs={"k": 5})
