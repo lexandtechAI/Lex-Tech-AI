@@ -28,7 +28,7 @@ from langchain_community.document_loaders import DirectoryLoader, PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from collections import defaultdict
 from datetime import datetime, timezone
-
+import google.generativeai as genai
 from auth_routes import router as auth_router
 from mail_logic import send_confirmation_email
 
