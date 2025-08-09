@@ -187,10 +187,10 @@ Answer as Lex & Tech AI:
 '''
 )
 
-# ------------------ LLM Setup ------------------
-llm = GoogleGenerativeAI(
-    model="models/gemini-2.0-flash", google_api_key=os.environ["GOOGLE_API_KEY"]
-)
+# ------------------ LLM Setup (using official Google library) ------------------
+genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
+llm = genai.GenerativeModel('gemini-1.5-flash')  # Using gemini-1.5-flash as it's the latest flash model
+
 
 # ------------------ Memory Store ------------------
 memory_store = defaultdict(
@@ -302,34 +302,108 @@ def load_pdf_if_needed(session_id: str) -> str:
     return ""
 
 
-# ------------------ RAG Endpoint (Simplified for Testing, with heavy logging) ------------------
+# ------------------ RAG Endpoint (Final Version) ------------------
 @app.post("/rag")
 async def rag_endpoint(
     payload: QueryInput,
     credentials: HTTPAuthorizationCredentials = Depends(security),
 ):
-    print("--- RAG (Simplified Test): Request received ---")
     try:
+        # --- Step 1: Extract data and get user profile ---
+        session_id = payload.session_id
         user_query = payload.query
-        print(f"--- RAG (Simplified Test): Query: {user_query[:50]}... ---")
+        token = credentials.credentials
+        decoded_token = jwt.decode(token, options={"verify_signature": False})
+        user_id = decoded_token.get("sub")
 
-        # --- Bypassing Retrieval & Context ---
-        print("--- RAG (Simplified Test): STEP 1: Skipping retrieval and context building ---")
+        headers = {"Authorization": f"Bearer {token}", "apikey": SUPABASE_KEY}
+        async with httpx.AsyncClient() as client:
+            profile_params = {"user_id": f"eq.{user_id}"}
+            response = await client.get(
+                PROFILE_SUPABASE_REST_ENDPOINT,
+                headers=headers,
+                params=profile_params
+            )
+            profile = response.json()
 
-        # --- LLM Invocation ---
-        print("--- RAG (Simplified Test): STEP 2: Invoking LLM ---")
-        ai_response = llm.invoke(user_query)
-        print("--- RAG (Simplified Test): STEP 2: LLM invocation successful ---")
+        if not profile:
+            raise HTTPException(status_code=404, detail="User profile not found")
+        user = profile[0]
 
-        # --- Returning Response ---
-        print("--- RAG (Simplified Test): STEP 3: Returning AI response ---")
+        # --- Step 2: Subscription Check ---
+        subscription = user.get("subscriptions", "").lower()
+        number_of_requests = user.get("number_of_requests", 0)
+        if subscription == "free" and number_of_requests is not None and number_of_requests > 4:
+            return {"answer": "Your number of requests is expired. Please upgrade to premium"}
+
+        # --- Step 3: Build the prompt with context ---
+        memory = memory_store[session_id]
+        chat_history = "\n".join([
+            f"User: {msg.content}" if isinstance(msg, HumanMessage)
+            else f"LexAdvisor: {msg.content}"
+            for msg in memory.chat_memory.messages
+        ])
+        docs = compression_retriever.get_relevant_documents(user_query)
+        faiss_context = "\n\n".join([doc.page_content for doc in docs])
+        pdf_context = extracted_pdf_text.get(session_id, "") or load_pdf_if_needed(session_id)
+        combined_context = f"{pdf_context.strip()}\n\n{faiss_context.strip()}".strip()
+
+        # Use the original legal_prompt template
+        prompt_text = legal_prompt.format(
+            context=combined_context,
+            question=user_query,
+            chat_history=chat_history
+        )
+
+        # --- Step 4: Generate content using the official Google library ---
+        response = llm.generate_content(prompt_text)
+        ai_response = response.text
+
+        # --- Step 5: Update memory and save to database ---
+        memory.chat_memory.add_user_message(user_query)
+        memory.chat_memory.add_ai_message(ai_response)
+
+        timestamp = datetime.now(timezone.utc)
+        async with httpx.AsyncClient() as client:
+            # Save user message
+            await client.post(
+                MESSAGE_SUPABASE_REST_ENDPOINT,
+                headers=headers,
+                json={
+                    "session_id": session_id,
+                    "user_id": user_id,
+                    "content": user_query,
+                    "is_user": True,
+                    "timestamp": timestamp.isoformat()
+                }
+            )
+            # Save AI response
+            await client.post(
+                MESSAGE_SUPABASE_REST_ENDPOINT,
+                headers=headers,
+                json={
+                    "session_id": session_id,
+                    "user_id": user_id,
+                    "content": ai_response,
+                    "is_user": False,
+                    "timestamp": timestamp.isoformat()
+                }
+            )
+            # Update request count
+            current_req = number_of_requests + 1
+            patch_url = f"{PROFILE_SUPABASE_REST_ENDPOINT}?id=eq.{user['id']}"
+            await client.patch(
+                patch_url,
+                headers=headers,
+                json={"number_of_requests": current_req}
+            )
+
         return {"answer": ai_response}
 
     except Exception as e:
-        print(f"--- RAG (Simplified Test): CRITICAL ERROR: An exception occurred: {e} ---")
         import traceback
         traceback.print_exc()
-        return {"error": str(e)}
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 
