@@ -302,143 +302,35 @@ def load_pdf_if_needed(session_id: str) -> str:
     return ""
 
 
-# ------------------ RAG Endpoint (with heavy logging) ------------------ 
+# ------------------ RAG Endpoint (Simplified for Testing, with heavy logging) ------------------
 @app.post("/rag")
 async def rag_endpoint(
     payload: QueryInput,
     credentials: HTTPAuthorizationCredentials = Depends(security),
 ):
-    print("--- RAG ENDPOINT: Request received ---")
-
+    print("--- RAG (Simplified Test): Request received ---")
     try:
-        # --- Step 0: Extract Session & Query ---
-        session_id = payload.session_id
         user_query = payload.query
-        print(f"--- RAG ENDPOINT: Session ID: {session_id}, Query: {user_query[:50]}... ---")
+        print(f"--- RAG (Simplified Test): Query: {user_query[:50]}... ---")
 
-        # --- Step 1: Decode JWT Token ---
-        token = credentials.credentials
-        decoded_token = jwt.decode(token, options={"verify_signature": False})
-        user_id = decoded_token.get("sub")
-        print(f"--- RAG ENDPOINT: Decoded token for user_id: {user_id} ---")
+        # --- Bypassing Retrieval & Context ---
+        print("--- RAG (Simplified Test): STEP 1: Skipping retrieval and context building ---")
 
-        headers = {
-            "Authorization": f"Bearer {token}",
-            "apikey": SUPABASE_KEY,
-            "Content-Type": "application/json",
-        }
+        # --- LLM Invocation ---
+        print("--- RAG (Simplified Test): STEP 2: Invoking LLM ---")
+        ai_response = llm.invoke(user_query)
+        print("--- RAG (Simplified Test): STEP 2: LLM invocation successful ---")
 
-        # --- Step 2: Fetch User Profile ---
-        print("--- RAG ENDPOINT: STEP 1: Fetching user profile ---")
-        async with httpx.AsyncClient() as client:
-            profile_params = {"user_id": f"eq.{user_id}"}
-            response = await client.get(
-                PROFILE_SUPABASE_REST_ENDPOINT,
-                headers=headers,
-                params=profile_params,
-            )
-            profile = response.json()
-
-        if not profile:
-            raise HTTPException(status_code=404, detail="User profile not found")
-
-        print("--- RAG ENDPOINT: STEP 1: Profile fetched successfully ---")
-
-        # --- Step 3: Subscription Check ---
-        user = profile[0]
-        subscription = user.get("subscriptions", "").lower()
-        number_of_requests = user.get("number_of_requests", 0)
-
-        if subscription == "free" and number_of_requests is not None and number_of_requests > 4:
-            return {"answer": "Your number of requests is expired. Please upgrade to premium"}
-
-        print("--- RAG ENDPOINT: STEP 2: Subscription check passed ---")
-
-        # --- Step 4: Save User Message to DB ---
-        timestamp = datetime.now(timezone.utc)
-        async with httpx.AsyncClient() as client:
-            await client.post(
-                MESSAGE_SUPABASE_REST_ENDPOINT,
-                headers=headers,
-                json={
-                    "session_id": session_id,
-                    "user_id": user_id,
-                    "content": user_query,
-                    "is_user": True,
-                    "timestamp": timestamp.isoformat(),
-                },
-            )
-        print("--- RAG ENDPOINT: STEP 3: User message saved to DB ---")
-
-        # --- Step 5: Retrieve Memory ---
-        memory = memory_store[session_id]
-        chat_history = "\n".join(
-            [
-                f"User: {msg.content}" if isinstance(msg, HumanMessage)
-                else f"LexAdvisor: {msg.content}"
-                for msg in memory.chat_memory.messages
-            ]
-        )
-        print("--- RAG ENDPOINT: STEP 4: Chat history retrieved from memory ---")
-
-        # --- Step 6: Retrieve Relevant Documents ---
-        print("--- RAG ENDPOINT: STEP 5: Retrieving relevant documents ---")
-        docs = compression_retriever.get_relevant_documents(user_query)
-        faiss_context = "\n\n".join([doc.page_content for doc in docs])
-        print("--- RAG ENDPOINT: STEP 5: Documents retrieved successfully ---")
-
-        # --- Step 7: Get PDF Context ---
-        pdf_context = extracted_pdf_text.get(session_id, "") or load_pdf_if_needed(session_id)
-        combined_context = f"{pdf_context.strip()}\n\n{faiss_context.strip()}".strip()
-        print("--- RAG ENDPOINT: STEP 6: Combined context created ---")
-
-        # --- Step 8: Format Prompt ---
-        prompt = legal_prompt.format(
-            context=combined_context,
-            question=user_query,
-            chat_history=chat_history
-        )
-        print("--- RAG ENDPOINT: STEP 7: Prompt formatted ---")
-
-        # --- Step 9: Invoke LLM ---
-        print("--- RAG ENDPOINT: STEP 8: Invoking LLM ---")
-        ai_response = llm.invoke(prompt)
-        print("--- RAG ENDPOINT: STEP 8: LLM invocation successful ---")
-
-        # --- Step 10: Update Memory ---
-        memory.chat_memory.add_user_message(user_query)
-        memory.chat_memory.add_ai_message(ai_response)
-        print("--- RAG ENDPOINT: STEP 9: Memory updated ---")
-
-        # --- Step 11: Save AI Response to DB & Update Request Count ---
-        async with httpx.AsyncClient() as client:
-            await client.post(
-                MESSAGE_SUPABASE_REST_ENDPOINT,
-                headers=headers,
-                json={
-                    "session_id": session_id,
-                    "user_id": user_id,
-                    "content": ai_response,
-                    "is_user": False,
-                    "timestamp": timestamp.isoformat(),
-                },
-            )
-
-            current_req = number_of_requests + 1
-            patch_url = f"{PROFILE_SUPABASE_REST_ENDPOINT}?id=eq.{user['id']}"
-            patch_body = {"number_of_requests": current_req}
-            await client.patch(patch_url, headers=headers, json=patch_body)
-
-        print("--- RAG ENDPOINT: STEP 10: AI response saved to DB ---")
-        print("--- RAG ENDPOINT: Request finished successfully ---")
-
+        # --- Returning Response ---
+        print("--- RAG (Simplified Test): STEP 3: Returning AI response ---")
         return {"answer": ai_response}
 
     except Exception as e:
-        print(f"--- RAG ENDPOINT: CRITICAL ERROR: An exception occurred: {e} ---")
+        print(f"--- RAG (Simplified Test): CRITICAL ERROR: An exception occurred: {e} ---")
         import traceback
         traceback.print_exc()
         return {"error": str(e)}
+
 
 
 # ------------------ List In-Memory Sessions ------------------
