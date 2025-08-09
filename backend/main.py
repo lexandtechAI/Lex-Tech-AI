@@ -302,7 +302,7 @@ def load_pdf_if_needed(session_id: str) -> str:
     return ""
 
 
-# ------------------ RAG Endpoint (with heavy logging) ------------------
+# ------------------ RAG Endpoint (with heavy logging) ------------------ 
 @app.post("/rag")
 async def rag_endpoint(
     payload: QueryInput,
