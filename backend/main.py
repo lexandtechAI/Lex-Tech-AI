@@ -310,166 +310,168 @@ async def rag_endpoint(
 ):
     try:
         # --- Step 1: Extract data and get user profile ---
-session_id = payload.session_id
-user_query = payload.query
-token = credentials.credentials
-decoded_token = jwt.decode(token, options={"verify_signature": False})
-user_id = decoded_token.get("sub")
+        session_id = payload.session_id
+        user_query = payload.query
+        token = credentials.credentials
+        decoded_token = jwt.decode(token, options={"verify_signature": False})
+        user_id = decoded_token.get("sub")
 
-headers = {
-    "Authorization": f"Bearer {token}",
-    "apikey": SUPABASE_KEY
-}
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "apikey": SUPABASE_KEY
+        }
 
-async with httpx.AsyncClient() as client:
-    profile_params = {"user_id": f"eq.{user_id}"}
-    response = await client.get(
-        PROFILE_SUPABASE_REST_ENDPOINT,
-        headers=headers,
-        params=profile_params
-    )
-    profile = response.json()
+        async with httpx.AsyncClient() as client:
+            profile_params = {"user_id": f"eq.{user_id}"}
+            response = await client.get(
+                PROFILE_SUPABASE_REST_ENDPOINT,
+                headers=headers,
+                params=profile_params
+            )
+            profile = response.json()
 
-if not profile:
-    raise HTTPException(status_code=404, detail="User profile not found")
+        if not profile:
+            raise HTTPException(status_code=404, detail="User profile not found")
 
-user = profile[0]
+        user = profile[0]
 
-# --- Step 2: Subscription Check ---
-subscription = user.get("subscriptions", "").lower()
-number_of_requests = user.get("number_of_requests", 0)
-if (
-    subscription == "free"
-    and number_of_requests is not None
-    and number_of_requests > 4
-):
-    return {
-        "answer": "Your number of requests is expired. Please upgrade to premium"
-    }
+        # --- Step 2: Subscription Check ---
+        subscription = user.get("subscriptions", "").lower()
+        number_of_requests = user.get("number_of_requests", 0)
+        if (
+            subscription == "free"
+            and number_of_requests is not None
+            and number_of_requests > 4
+        ):
+            return {
+                "answer": "Your number of requests is expired. Please upgrade to premium"
+            }
 
-# Ensure chat session exists
-async with httpx.AsyncClient() as client:
-    try:
-        await client.post(
-            SUPABASE_REST_ENDPOINT,
-            headers=headers,
-            json={
-                "id": session_id,
+        # Ensure chat session exists
+        async with httpx.AsyncClient() as client:
+            try:
+                await client.post(
+                    SUPABASE_REST_ENDPOINT,
+                    headers=headers,
+                    json={
+                        "id": session_id,
+                        "user_id": user_id,
+                        "title": user_query[:50],
+                    },
+                )
+            except httpx.HTTPStatusError as e:
+                # If session already exists (e.g., 409 Conflict), it's fine.
+                # Otherwise, re-raise the error.
+                if e.response.status_code != 409:
+                    raise
+
+        # --- Step 3: Build the prompt with context ---
+        memory = memory_store[session_id]
+
+        # If memory is empty, load history from Supabase
+        if not memory.chat_memory.messages:
+            message_params = {
+                "session_id": f"eq.{session_id}",
+                "select": "*",
+                "order": "timestamp.asc"
+            }
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    MESSAGE_SUPABASE_REST_ENDPOINT,
+                    headers=headers,
+                    params=message_params
+                )
+            if response.status_code == 200:
+                history = response.json()
+                for msg in history:
+                    if msg.get("is_user"):
+                        memory.chat_memory.add_user_message(msg.get("content"))
+                    else:
+                        memory.chat_memory.add_ai_message(msg.get("content"))
+
+        chat_history = "\n".join([
+            f"User: {msg.content}" if isinstance(msg, HumanMessage)
+            else f"LexAdvisor: {msg.content}"
+            for msg in memory.chat_memory.messages
+        ])
+
+        docs = compression_retriever.get_relevant_documents(user_query)
+        faiss_context = "\n\n".join([doc.page_content for doc in docs])
+        pdf_context = (
+            extracted_pdf_text.get(session_id, "")
+            or load_pdf_if_needed(session_id)
+        )
+        combined_context = (
+            f"{pdf_context.strip()}\n\n{faiss_context.strip()}".strip()
+        )
+
+        # Use the original legal_prompt template
+        prompt_text = legal_prompt.format(
+            context=combined_context,
+            question=user_query,
+            chat_history=chat_history
+        )
+
+        # --- Step 4: Generate content using the official Google library ---
+        response = llm.generate_content(prompt_text)
+        ai_response = response.text
+
+        # --- Step 5: Update memory and save to database ---
+        memory.chat_memory.add_user_message(user_query)
+        memory.chat_memory.add_ai_message(ai_response)
+
+        timestamp = datetime.now(timezone.utc)
+        async with httpx.AsyncClient() as client:
+            # Save user message
+            print("Saving user message to Supabase...")
+            user_message_payload = {
+                "session_id": session_id,
                 "user_id": user_id,
-                "title": user_query[:50],
-            },
-        )
-    except httpx.HTTPStatusError as e:
-        # If session already exists (e.g., 409 Conflict), it's fine.
-        # Otherwise, re-raise the error.
-        if e.response.status_code != 409:
-            raise
+                "content": user_query,
+                "is_user": True,
+                "timestamp": timestamp.isoformat()
+            }
+            response = await client.post(
+                MESSAGE_SUPABASE_REST_ENDPOINT,
+                headers=headers,
+                json=user_message_payload
+            )
+            print(f"Supabase response for user message: {response.status_code}, {response.text}")
+            print("User message saved.")
 
-# --- Step 3: Build the prompt with context ---
-memory = memory_store[session_id]
+            # Save AI response
+            print("Saving AI response to Supabase...")
+            ai_message_payload = {
+                "session_id": session_id,
+                "user_id": user_id,
+                "content": ai_response,
+                "is_user": False,
+                "timestamp": timestamp.isoformat()
+            }
+            response = await client.post(
+                MESSAGE_SUPABASE_REST_ENDPOINT,
+                headers=headers,
+                json=ai_message_payload
+            )
+            print(f"Supabase response for AI message: {response.status_code}, {response.text}")
+            print("AI response saved.")
 
-# If memory is empty, load history from Supabase
-if not memory.chat_memory.messages:
-    message_params = {
-        "session_id": f"eq.{session_id}",
-        "select": "*",
-        "order": "timestamp.asc"
-    }
-    async with httpx.AsyncClient() as client:
-        response = await client.get(
-            MESSAGE_SUPABASE_REST_ENDPOINT,
-            headers=headers,
-            params=message_params
-        )
-    if response.status_code == 200:
-        history = response.json()
-        for msg in history:
-            if msg.get("is_user"):
-                memory.chat_memory.add_user_message(msg.get("content"))
-            else:
-                memory.chat_memory.add_ai_message(msg.get("content"))
+            # Update request count
+            current_req = number_of_requests + 1
+            patch_url = f"{PROFILE_SUPABASE_REST_ENDPOINT}?id=eq.{user['id']}"
+            await client.patch(
+                patch_url,
+                headers=headers,
+                json={"number_of_requests": current_req}
+            )
 
-chat_history = "\n".join([
-    f"User: {msg.content}" if isinstance(msg, HumanMessage)
-    else f"LexAdvisor: {msg.content}"
-    for msg in memory.chat_memory.messages
-])
+        return {"answer": ai_response}
 
-docs = compression_retriever.get_relevant_documents(user_query)
-faiss_context = "\n\n".join([doc.page_content for doc in docs])
-pdf_context = (
-    extracted_pdf_text.get(session_id, "")
-    or load_pdf_if_needed(session_id)
-)
-combined_context = (
-    f"{pdf_context.strip()}\n\n{faiss_context.strip()}".strip()
-)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
 
-# Use the original legal_prompt template
-prompt_text = legal_prompt.format(
-    context=combined_context,
-    question=user_query,
-    chat_history=chat_history
-)
-
-# --- Step 4: Generate content using the official Google library ---
-response = llm.generate_content(prompt_text)
-ai_response = response.text
-
-# --- Step 5: Update memory and save to database ---
-memory.chat_memory.add_user_message(user_query)
-memory.chat_memory.add_ai_message(ai_response)
-
-timestamp = datetime.now(timezone.utc)
-async with httpx.AsyncClient() as client:
-    # Save user message
-    print("Saving user message to Supabase...")
-    user_message_payload = {
-        "session_id": session_id,
-        "user_id": user_id,
-        "content": user_query,
-        "is_user": True,
-        "timestamp": timestamp.isoformat()
-    }
-    response = await client.post(
-        MESSAGE_SUPABASE_REST_ENDPOINT,
-        headers=headers,
-        json=user_message_payload
-    )
-    print(f"Supabase response for user message: {response.status_code}, {response.text}")
-    print("User message saved.")
-
-    # Save AI response
-    print("Saving AI response to Supabase...")
-    ai_message_payload = {
-        "session_id": session_id,
-        "user_id": user_id,
-        "content": ai_response,
-        "is_user": False,
-        "timestamp": timestamp.isoformat()
-    }
-    response = await client.post(
-        MESSAGE_SUPABASE_REST_ENDPOINT,
-        headers=headers,
-        json=ai_message_payload
-    )
-    print(f"Supabase response for AI message: {response.status_code}, {response.text}")
-    print("AI response saved.")
-
-    # Update request count
-    current_req = number_of_requests + 1
-    patch_url = f"{PROFILE_SUPABASE_REST_ENDPOINT}?id=eq.{user['id']}"
-    await client.patch(
-        patch_url,
-        headers=headers,
-        json={"number_of_requests": current_req}
-    )
-
-return {"answer": ai_response}
-except Exception as e:
-import traceback
-traceback.print_exc()
-raise HTTPException(status_code=500, detail=str(e))
 
 
 
