@@ -1,13 +1,18 @@
-from dotenv import load_dotenv
-
-load_dotenv()
-
 import os
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends  # Added Depends
 from pydantic import BaseModel
 from supabase import create_client, Client
 from gotrue.errors import AuthApiError
 from typing import Literal
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadTimeSignature  # New import
+from mail_logic import send_verification_email  # New import
+
+# --- Security Configuration ---
+# IMPORTANT: Change this to a strong, random secret in production!
+# Load from environment variable in production
+SECRET_KEY = os.getenv("SECRET_KEY", "your-super-secret-key")  # Use a strong secret!
+s = URLSafeTimedSerializer(SECRET_KEY)
+
 
 
 # ------------------ Environment ------------------
@@ -71,18 +76,34 @@ def register(data: AuthRequest):
         # Store metadata separately if needed
         user_id = result.user.id if hasattr(result, "user") else None
         if user_id:
-            supabase.table("profiles").insert(
-                {
-                    "user_id": user_id,
-                    "subscriptions": subscriptions,
-                    "is_admin": False,
-                    "email": data.email,
-                    "phone": 0,
-                    "organization": organisation_name,
-                    "number_of_requests": number_of_requests,
-                }
-            ).execute()
-        return {"message": "User registered successfully", "user": result.user}
+    # Set email_verified to False by default for new registrations
+    supabase.table("profiles").insert(
+        {
+            "user_id": user_id,
+            "subscriptions": subscriptions,
+            "is_admin": False,
+            "email": data.email,
+            "phone": 0,
+            "organization": organisation_name,
+            "number_of_requests": number_of_requests,
+            "email_verified": False,  # New column
+        }
+    ).execute()
+
+    # Generate verification token and send email
+    token = s.dumps(data.email, salt='email-verification')
+
+    # IMPORTANT: Replace with your actual frontend verification URL
+    # This URL should point to a frontend route that calls your /verify-email endpoint
+    verification_link = f"https://your-frontend-domain.com/verify-email?token={token}"
+
+    send_verification_email(data.email, verification_link)
+
+return {
+    "message": "User registered successfully. Please check your email for verification link.",
+    "user": result.user
+}
+
     except AuthApiError as e:
         print("❌ Registration failed:", str(e))
         raise HTTPException(status_code=400, detail=str(e))
@@ -114,3 +135,30 @@ def login(data: LoginRequest):
     except AuthApiError as e:
         print("❌ Login failed:", str(e))
         raise HTTPException(status_code=401, detail=str(e))
+
+# ------------------ Email Verification ------------------
+@router.get("/verify-email")
+async def verify_email(token: str):
+    try:
+        # Decode token (valid for 1 hour)
+        email = s.loads(token, salt='email-verification', max_age=3600)
+
+        # Update user's email_verified status in Supabase
+        response = supabase.table("profiles").update(
+            {"email_verified": True}
+        ).eq("email", email).execute()
+
+        if response.data:
+            return {"message": "Email verified successfully!"}
+        else:
+            raise HTTPException(status_code=400, detail="Verification failed or email not found.")
+
+    except SignatureExpired:
+        raise HTTPException(status_code=400, detail="Verification link expired.")
+
+    except BadTimeSignature:
+        raise HTTPException(status_code=400, detail="Invalid verification link.")
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+
