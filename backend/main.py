@@ -337,12 +337,35 @@ async def rag_endpoint(
             return {"answer": "Your number of requests is expired. Please upgrade to premium"}
 
         # --- Step 3: Build the prompt with context ---
-        memory = memory_store[session_id]
-        chat_history = "\n".join([
-            f"User: {msg.content}" if isinstance(msg, HumanMessage)
-            else f"LexAdvisor: {msg.content}"
-            for msg in memory.chat_memory.messages
-        ])
+memory = memory_store[session_id]
+
+# If memory is empty, load history from Supabase
+if not memory.chat_memory.messages:
+    message_params = {
+        "session_id": f"eq.{session_id}",
+        "select": "*",
+        "order": "timestamp.asc"
+    }
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            MESSAGE_SUPABASE_REST_ENDPOINT,
+            headers=headers,
+            params=message_params
+        )
+    if response.status_code == 200:
+        history = response.json()
+        for msg in history:
+            if msg.get("is_user"):
+                memory.chat_memory.add_user_message(msg.get("content"))
+            else:
+                memory.chat_memory.add_ai_message(msg.get("content"))
+
+chat_history = "\n".join([
+    f"User: {msg.content}" if isinstance(msg, HumanMessage)
+    else f"LexAdvisor: {msg.content}"
+    for msg in memory.chat_memory.messages
+])
+
         docs = compression_retriever.get_relevant_documents(user_query)
         faiss_context = "\n\n".join([doc.page_content for doc in docs])
         pdf_context = extracted_pdf_text.get(session_id, "") or load_pdf_if_needed(session_id)
