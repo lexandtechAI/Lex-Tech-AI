@@ -75,34 +75,35 @@ def register(data: AuthRequest):
 
         # Store metadata separately if needed
         user_id = result.user.id if hasattr(result, "user") else None
-        if user_id:
+      if user_id:
     # Set email_verified to False by default for new registrations
-    supabase.table("profiles").insert(
-        {
-            "user_id": user_id,
-            "subscriptions": subscriptions,
-            "is_admin": False,
-            "email": data.email,
-            "phone": 0,
-            "organization": organisation_name,
-            "number_of_requests": number_of_requests,
-            "email_verified": False,  # New column
-        }
-    ).execute()
+         supabase.table("profiles").insert(
+             {
+                 "user_id": user_id,
+                 "subscriptions": subscriptions,
+                 "is_admin": False,
+                 "email": data.email,
+                 "phone": 0,
+                 "organization": organisation_name,
+                 "number_of_requests": number_of_requests,
+                 "email_verified": False,  # New column
+             }
+        ).execute()
 
     # Generate verification token and send email
-    token = s.dumps(data.email, salt='email-verification')
-
+        token = s.dumps(data.email, salt='email-verification')
     # IMPORTANT: Replace with your actual frontend verification URL
     # This URL should point to a frontend route that calls your /verify-email endpoint
-    verification_link = f"https://lexandtech.pro/verify-email?token={token}"
+        verification_link = f"https://your-frontend-domain.com/verify-email?token={token}"  # Replace with your actual frontend URL
+        send_verification_email(data.email, verification_link)
 
-    send_verification_email(data.email, verification_link)
+    return {
+        "message": "User registered successfully. Please check your email for verification link.",
+        "user": result.user,
+    }
+  
+      
 
-return {
-    "message": "User registered successfully. Please check your email for verification link.",
-    "user": result.user
-}
 
     except AuthApiError as e:
         print("❌ Registration failed:", str(e))
