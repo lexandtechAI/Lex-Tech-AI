@@ -316,7 +316,10 @@ async def rag_endpoint(
         decoded_token = jwt.decode(token, options={"verify_signature": False})
         user_id = decoded_token.get("sub")
 
-        headers = {"Authorization": f"Bearer {token}", "apikey": SUPABASE_KEY}
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "apikey": SUPABASE_KEY
+        }
         async with httpx.AsyncClient() as client:
             profile_params = {"user_id": f"eq.{user_id}"}
             response = await client.get(
@@ -333,11 +336,18 @@ async def rag_endpoint(
         # --- Step 2: Subscription Check ---
         subscription = user.get("subscriptions", "").lower()
         number_of_requests = user.get("number_of_requests", 0)
-        if subscription == "free" and number_of_requests is not None and number_of_requests > 4:
-            return {"answer": "Your number of requests is expired. Please upgrade to premium"}
+        if (
+            subscription == "free"
+            and number_of_requests is not None
+            and number_of_requests > 4
+        ):
+            return {
+                "answer": "Your number of requests is expired. Please upgrade to premium"
+            }
 
         # --- Step 3: Build the prompt with context ---
         memory = memory_store[session_id]
+
         # If memory is empty, load history from Supabase
         if not memory.chat_memory.messages:
             message_params = {
@@ -367,8 +377,13 @@ async def rag_endpoint(
 
         docs = compression_retriever.get_relevant_documents(user_query)
         faiss_context = "\n\n".join([doc.page_content for doc in docs])
-        pdf_context = extracted_pdf_text.get(session_id, "") or load_pdf_if_needed(session_id)
-        combined_context = f"{pdf_context.strip()}\n\n{faiss_context.strip()}".strip()
+        pdf_context = (
+            extracted_pdf_text.get(session_id, "")
+            or load_pdf_if_needed(session_id)
+        )
+        combined_context = (
+            f"{pdf_context.strip()}\n\n{faiss_context.strip()}".strip()
+        )
 
         # Use the original legal_prompt template
         prompt_text = legal_prompt.format(
@@ -382,54 +397,53 @@ async def rag_endpoint(
         ai_response = response.text
 
         # --- Step 5: Update memory and save to database ---
-memory.chat_memory.add_user_message(user_query)
-memory.chat_memory.add_ai_message(ai_response)
+        memory.chat_memory.add_user_message(user_query)
+        memory.chat_memory.add_ai_message(ai_response)
 
-timestamp = datetime.now(timezone.utc)
-async with httpx.AsyncClient() as client:
-    # Save user message
-    print("Saving user message to Supabase...")
-    user_message_payload = {
-        "session_id": session_id,
-        "user_id": user_id,
-        "content": user_query,
-        "is_user": True,
-        "timestamp": timestamp.isoformat()
-    }
-    response = await client.post(
-        MESSAGE_SUPABASE_REST_ENDPOINT,
-        headers=headers,
-        json=user_message_payload
-    )
-    print(f"Supabase response for user message: {response.status_code}, {response.text}")
-    print("User message saved.")
+        timestamp = datetime.now(timezone.utc)
+        async with httpx.AsyncClient() as client:
+            # Save user message
+            print("Saving user message to Supabase...")
+            user_message_payload = {
+                "session_id": session_id,
+                "user_id": user_id,
+                "content": user_query,
+                "is_user": True,
+                "timestamp": timestamp.isoformat()
+            }
+            response = await client.post(
+                MESSAGE_SUPABASE_REST_ENDPOINT,
+                headers=headers,
+                json=user_message_payload
+            )
+            print(f"Supabase response for user message: {response.status_code}, {response.text}")
+            print("User message saved.")
 
-    # Save AI response
-    print("Saving AI response to Supabase...")
-    ai_message_payload = {
-        "session_id": session_id,
-        "user_id": user_id,
-        "content": ai_response,
-        "is_user": False,
-        "timestamp": timestamp.isoformat()
-    }
-    response = await client.post(
-        MESSAGE_SUPABASE_REST_ENDPOINT,
-        headers=headers,
-        json=ai_message_payload
-    )
-    print(f"Supabase response for AI message: {response.status_code}, {response.text}")
-    print("AI response saved.")
+            # Save AI response
+            print("Saving AI response to Supabase...")
+            ai_message_payload = {
+                "session_id": session_id,
+                "user_id": user_id,
+                "content": ai_response,
+                "is_user": False,
+                "timestamp": timestamp.isoformat()
+            }
+            response = await client.post(
+                MESSAGE_SUPABASE_REST_ENDPOINT,
+                headers=headers,
+                json=ai_message_payload
+            )
+            print(f"Supabase response for AI message: {response.status_code}, {response.text}")
+            print("AI response saved.")
 
-    # Update request count
-    current_req = number_of_requests + 1
-    patch_url = f"{PROFILE_SUPABASE_REST_ENDPOINT}?id=eq.{user['id']}"
-    await client.patch(
-        patch_url,
-        headers=headers,
-        json={"number_of_requests": current_req}
-    )
-
+            # Update request count
+            current_req = number_of_requests + 1
+            patch_url = f"{PROFILE_SUPABASE_REST_ENDPOINT}?id=eq.{user['id']}"
+            await client.patch(
+                patch_url,
+                headers=headers,
+                json={"number_of_requests": current_req}
+            )
 
         return {"answer": ai_response}
 
@@ -437,6 +451,7 @@ async with httpx.AsyncClient() as client:
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
+
 
 
 
