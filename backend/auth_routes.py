@@ -95,7 +95,7 @@ def register(data: AuthRequest):
 
     # IMPORTANT: Replace with your actual frontend verification URL
     # This URL should point to a frontend route that calls your /verify-email endpoint
-    verification_link = f"https://your-frontend-domain.com/verify-email?token={token}"
+    verification_link = f"https://lexandtech.pro/verify-email?token={token}"
 
     send_verification_email(data.email, verification_link)
 
