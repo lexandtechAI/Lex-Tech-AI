@@ -12,6 +12,7 @@ import DisclaimerPopup from './components/DisclaimerPopup';
 import CookieConsentPopup from './components/CookieConsentPopup'; // Import the new component
 import PrivacyPolicyPage from './components/PrivacyPolicyPage'; // Import the new component
 import { ApiClient } from './utils/api';
+import EmailVerificationPage from './components/EmailVerificationPage'; // New import
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -112,6 +113,9 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
+
+{/* Email Verification Route */}
+<Route path="/verify-email" element={<EmailVerificationPage />} />
 
         {/* Catch All */}
         <Route path="*" element={<Navigate to="/" replace />} />
