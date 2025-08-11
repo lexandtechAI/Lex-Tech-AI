@@ -382,43 +382,54 @@ async def rag_endpoint(
         ai_response = response.text
 
         # --- Step 5: Update memory and save to database ---
-        memory.chat_memory.add_user_message(user_query)
-        memory.chat_memory.add_ai_message(ai_response)
+memory.chat_memory.add_user_message(user_query)
+memory.chat_memory.add_ai_message(ai_response)
 
-        timestamp = datetime.now(timezone.utc)
-        async with httpx.AsyncClient() as client:
-            # Save user message
-            await client.post(
-                MESSAGE_SUPABASE_REST_ENDPOINT,
-                headers=headers,
-                json={
-                    "session_id": session_id,
-                    "user_id": user_id,
-                    "content": user_query,
-                    "is_user": True,
-                    "timestamp": timestamp.isoformat()
-                }
-            )
-            # Save AI response
-            await client.post(
-                MESSAGE_SUPABASE_REST_ENDPOINT,
-                headers=headers,
-                json={
-                    "session_id": session_id,
-                    "user_id": user_id,
-                    "content": ai_response,
-                    "is_user": False,
-                    "timestamp": timestamp.isoformat()
-                }
-            )
-            # Update request count
-            current_req = number_of_requests + 1
-            patch_url = f"{PROFILE_SUPABASE_REST_ENDPOINT}?id=eq.{user['id']}"
-            await client.patch(
-                patch_url,
-                headers=headers,
-                json={"number_of_requests": current_req}
-            )
+timestamp = datetime.now(timezone.utc)
+async with httpx.AsyncClient() as client:
+    # Save user message
+    print("Saving user message to Supabase...")
+    user_message_payload = {
+        "session_id": session_id,
+        "user_id": user_id,
+        "content": user_query,
+        "is_user": True,
+        "timestamp": timestamp.isoformat()
+    }
+    response = await client.post(
+        MESSAGE_SUPABASE_REST_ENDPOINT,
+        headers=headers,
+        json=user_message_payload
+    )
+    print(f"Supabase response for user message: {response.status_code}, {response.text}")
+    print("User message saved.")
+
+    # Save AI response
+    print("Saving AI response to Supabase...")
+    ai_message_payload = {
+        "session_id": session_id,
+        "user_id": user_id,
+        "content": ai_response,
+        "is_user": False,
+        "timestamp": timestamp.isoformat()
+    }
+    response = await client.post(
+        MESSAGE_SUPABASE_REST_ENDPOINT,
+        headers=headers,
+        json=ai_message_payload
+    )
+    print(f"Supabase response for AI message: {response.status_code}, {response.text}")
+    print("AI response saved.")
+
+    # Update request count
+    current_req = number_of_requests + 1
+    patch_url = f"{PROFILE_SUPABASE_REST_ENDPOINT}?id=eq.{user['id']}"
+    await client.patch(
+        patch_url,
+        headers=headers,
+        json={"number_of_requests": current_req}
+    )
+
 
         return {"answer": ai_response}
 
