@@ -345,6 +345,27 @@ async def rag_endpoint(
                 "answer": "Your number of requests is expired. Please upgrade to premium"
             }
 
+
+        # Ensure chat session exists
+async with httpx.AsyncClient() as client:
+    try:
+        await client.post(
+            SUPABASE_REST_ENDPOINT,
+            headers=headers,
+            json={
+                "id": session_id,
+                "user_id": user_id,
+                "title": user_query[:50],
+            },
+        )
+    except httpx.HTTPStatusError as e:
+        # If session already exists (e.g., 409 Conflict), it's fine.
+        # Otherwise, re-raise the error.
+        if e.response.status_code != 409:
+            raise
+
+        
+        
         # --- Step 3: Build the prompt with context ---
         memory = memory_store[session_id]
 
