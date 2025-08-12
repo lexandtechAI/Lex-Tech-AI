@@ -29,6 +29,7 @@ const LandingPage: React.FC = () => {
                 A Product By Lex & Tech Consulting Services
               </p>
             </div>
+          </div>
             <div className="flex space-x-4">
               <Link to="/pricing" className="px-6 py-3 text-white font-semibold rounded-lg hover:bg-white/10 transition-all duration-200">Pricing</Link>
               <Link to="/login" className="px-6 py-3 bg-white text-amber-700 font-semibold rounded-lg shadow-lg hover:bg-gray-50 transition-all duration-200">Login</Link>
