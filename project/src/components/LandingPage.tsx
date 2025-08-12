@@ -25,7 +25,9 @@ const LandingPage: React.FC = () => {
                 <Scale className="w-8 h-8 text-amber-700" />
               </div>
               <h1 className="text-2xl sm:text-3xl font-bold text-white">Lex & Tech AI</h1>
-              <p className="text-sm text-amber-200">A Product By Lex & Tech Consulting Services</p>
+              <p className="text-sm text-amber-200 font light">
+                A Product By Lex & Tech Consulting Services
+              </p>
             </div>
             <div className="flex space-x-4">
               <Link to="/pricing" className="px-6 py-3 text-white font-semibold rounded-lg hover:bg-white/10 transition-all duration-200">Pricing</Link>
