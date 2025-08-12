@@ -75,7 +75,7 @@ if os.path.exists(FAISS_INDEX_PATH):
         allow_dangerous_deserialization=True
     )
 else:
-    print("⚠️ No FAISS index found. Building new index from source documents...")
+    print("⚠ No FAISS index found. Building new index from source documents...")
     print("This will only happen once and may take a few minutes.")
 
     # Path to source documents on persistent disk
@@ -90,7 +90,7 @@ else:
     # Load documents from directory
     loader = DirectoryLoader(
         SOURCE_DOCS_PATH,
-        glob="**/*.pdf",  # Load all PDF files in subdirectories
+        glob="/*.pdf",  # Load all PDF files in subdirectories
         loader_cls=PyPDFLoader,
         show_progress=True,
         use_multithreading=True
@@ -104,7 +104,7 @@ else:
         chunk_size=1000,
         chunk_overlap=200
     )
-    print("✂️ Splitting documents into chunks...")
+    print("✂ Splitting documents into chunks...")
     texts = text_splitter.split_documents(documents)
 
     # Create FAISS index from document chunks
@@ -149,14 +149,14 @@ Your guidance must be:
 
 Instructions:
 - All cases are post 1st July 2024, unless the user explicitly mentions otherwise.
-- Always cite specific **sections** from applicable Acts wherever relevant
+- Always cite specific *sections* from applicable Acts wherever relevant
 - Always cite the section number in the answer if applicable or relevant
 - Avoid generalizations; base all advice on legal grounds
-- Do **not** reference IPC or CrPC — use **BNS** and **BNSS** only (post-1st July 2024)
+- Do *not* reference IPC or CrPC — use *BNS* and *BNSS* only (post-1st July 2024)
 - Be concise but complete: explain legal remedies and procedures clearly
 - If the user\'s question involves criminal procedure, refer to BNSS (e.g., FIR registration, arrest, bail)
 - If the case involves digital privacy, refer to the DPDP Act or IT Act sections like 66E or 67
-- If relevant, distinguish between **cognizable** and **non-cognizable** offences under BNS
+- If relevant, distinguish between *cognizable* and *non-cognizable* offences under BNS
 - Suggest follow-up questions the user can ask for further help
 - If asked to explain or define the law or Acts, respond with its defination and meaning.
 
@@ -202,7 +202,6 @@ memory_store = defaultdict(
 # ------------------ PDF Upload Memory ------------------
 uploaded_docs = {}
 extracted_pdf_text = {}
-
 
 # ------------------ FastAPI Setup ------------------
 app = FastAPI()
@@ -313,7 +312,6 @@ async def rag_endpoint(
     payload: QueryInput,
     credentials: HTTPAuthorizationCredentials = Depends(security),
 ):
-        
     try:
         # --- Step 1: Extract data and get user profile ---
         session_id = payload.session_id
@@ -463,13 +461,13 @@ async def rag_endpoint(
             print("AI response saved.")
 
             # Update request count
-        current_req = number_of_requests + 1
-        patch_url = f"{PROFILE_SUPABASE_REST_ENDPOINT}?id=eq.{user['id']}"
-        await client.patch(
-            patch_url,
-            headers=headers,
-            json={"number_of_requests": current_req}
-        )
+            current_req = number_of_requests + 1
+            patch_url = f"{PROFILE_SUPABASE_REST_ENDPOINT}?id=eq.{user['id']}"
+            await client.patch(
+                patch_url,
+                headers=headers,
+                json={"number_of_requests": current_req}
+            )
 
         return {"answer": ai_response}
 
@@ -477,6 +475,8 @@ async def rag_endpoint(
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
+
+
 
 
 # ------------------ List In-Memory Sessions ------------------
