@@ -24,12 +24,13 @@ const LandingPage: React.FC = () => {
               <div className="p-2 bg-white rounded-xl shadow-lg">
                 <Scale className="w-8 h-8 text-amber-700" />
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white">Lex & Tech AI</h1>
-              <p className="text-sm text-amber-200 font light">
-                A Product By Lex & Tech Consulting Services
-              </p>
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-bold text-white">Lex & Tech AI</h1>
+                <p className="text-sm text-amber-200 font-light mt-1">
+                  A Product By Lex & Tech Consulting Services
+                </p>
+              </div>
             </div>
-          </div>
             <div className="flex space-x-4">
               <Link to="/pricing" className="px-6 py-3 text-white font-semibold rounded-lg hover:bg-white/10 transition-all duration-200">Pricing</Link>
               <Link to="/login" className="px-6 py-3 bg-white text-amber-700 font-semibold rounded-lg shadow-lg hover:bg-gray-50 transition-all duration-200">Login</Link>
