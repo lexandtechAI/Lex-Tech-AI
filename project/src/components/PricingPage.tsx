@@ -60,7 +60,7 @@ const PricingPage: React.FC = () => {
             </div>
             <ul className="space-y-4 mb-8 text-gray-700 flex-grow">
               {[
-                '4 queries per user',
+                '2 queries per user',
                 'Chat history',
                 'Email support',
               ].map((feature, idx) => (
