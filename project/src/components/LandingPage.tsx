@@ -89,7 +89,7 @@ const LandingPage: React.FC = () => {
             <FeatureCard 
               icon={BookOpen} 
               title="Other Key Acts" 
-              description="Information Technology Act, Arbitration and Conciliation Act, Limitation Act, Insolvency and Bankruptcy Act, and many more..." 
+              description="Information Technology Act, Arbitration and Conciliation Act, Limitation Act, Insolvency and Bankruptcy Act, Family Laws and many more..." 
             />
           </div>
         </div>
