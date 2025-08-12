@@ -9,11 +9,11 @@ const PricingPage: React.FC = () => {
       <header className="bg-gradient-to-r from-amber-600 via-amber-700 to-amber-800 shadow-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
-            <Link to="/" className="flex items-center space-x-3" aria-label="LexAdvisor Home">
+            <Link to="/" className="flex items-center space-x-3" aria-label="Lex & Tech AI Home">
               <div className="p-2 bg-white rounded-xl shadow-lg">
                 <Scale className="w-8 h-8 text-amber-700" />
               </div>
-              <h1 className="text-3xl font-bold text-white">LexAdvisor</h1>
+              <h1 className="text-3xl font-bold text-white">Lex & Tech AI</h1>
             </Link>
             <div className="flex space-x-4">
               <Link
@@ -111,7 +111,7 @@ const PricingPage: React.FC = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h3 className="text-4xl font-bold mb-6">Ready to Transform Your Legal Research?</h3>
           <p className="text-xl mb-8">
-            Join thousands of legal professionals who trust LexAdvisor for accurate, comprehensive legal guidance.
+            Join thousands of legal professionals who trust Lex & Tech AI for accurate, comprehensive legal guidance.
           </p>
           <Link
             to="/register"
