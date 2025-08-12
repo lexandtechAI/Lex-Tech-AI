@@ -31,7 +31,6 @@ from datetime import datetime, timezone
 import google.generativeai as genai
 from auth_routes import router as auth_router
 from mail_logic import send_confirmation_email
-import threading
 
 security = HTTPBearer()
 
@@ -204,10 +203,6 @@ memory_store = defaultdict(
 uploaded_docs = {}
 extracted_pdf_text = {}
 
-# ------------------ Concurrency Limit ------------------
-active_users_count = 0
-active_users_lock = threading.Lock()
-MAX_CONCURRENT_USERS = 3
 
 # ------------------ FastAPI Setup ------------------
 app = FastAPI()
@@ -318,15 +313,6 @@ async def rag_endpoint(
     payload: QueryInput,
     credentials: HTTPAuthorizationCredentials = Depends(security),
 ):
-    global active_users_count
-
-    # --- Concurrency control ---
-    with active_users_lock:
-        if active_users_count >= MAX_CONCURRENT_USERS:
-            return {
-                "answer": "Huge user demand right now - hang tight, we are scaling fast to keep up"
-            }
-        active_users_count += 1
         
     try:
         # --- Step 1: Extract data and get user profile ---
@@ -491,10 +477,6 @@ async def rag_endpoint(
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
-
-    finally:
-        with active_users_lock:
-            active_users_count -= 1  
 
 
 # ------------------ List In-Memory Sessions ------------------
