@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 import os
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from supabase import create_client, Client
 from gotrue.errors import AuthApiError
@@ -37,14 +37,12 @@ class LoginRequest(BaseModel):
 def register(data: AuthRequest):
     try:
         print(f"📨 Registering: {data.email}")
-        # Logic for subscription-based request limits
 
-        result = supabase.auth.sign_up(
-            {
-                "email": data.email,
-                "password": data.password,
-            }
-        )
+        # Logic for subscription-based request limits
+        result = supabase.auth.sign_up({
+            "email": data.email,
+            "password": data.password,
+        })
 
         whitelist_response = (
             supabase.table("whitelisted_emails")
@@ -71,24 +69,21 @@ def register(data: AuthRequest):
         user_id = result.user.id if hasattr(result, "user") else None
         if user_id:
             # Set email_verified to False by default for new registrations
-            supabase.table("profiles").insert(
-                {
-                    "user_id": user_id,
-                    "subscriptions": subscriptions,
-                    "is_admin": False,
-                    "email": data.email,
-                    "phone": 0,
-                    "organization": organisation_name,
-                    "number_of_requests": number_of_requests,
-                    "email_verified": False,  # New column
-                }
-            ).execute()
+            supabase.table("profiles").insert({
+                "user_id": user_id,
+                "subscriptions": subscriptions,
+                "is_admin": False,
+                "email": data.email,
+                "phone": 0,
+                "organization": organisation_name,
+                "number_of_requests": number_of_requests,
+                "email_verified": False,  # New column
+            }).execute()
 
             # Generate verification token and send email
             token = s.dumps(data.email, salt='email-verification')
-            # IMPORTANT: Replace with your actual frontend verification URL
-            # This URL should point to a frontend route that calls your /verify-email endpoint
-            verification_link = f"https://lexandtech.pro/verify-email?token={token}"  # Replace with your actual frontend URL
+            FRONTEND_URL = os.getenv("FRONTEND_URL", "https://lexandtech.pro")
+            verification_link = f"{FRONTEND_URL}/verify-email?token={token}"
             send_verification_email(data.email, verification_link)
 
         return {
@@ -96,7 +91,7 @@ def register(data: AuthRequest):
             "user": result.user,
         }
     except AuthApiError as e:
-        print("❌ Registration failed:", str(e))
+        print(f"❌ Registration failed:  {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))
 
 # ------------------ Login ------------------
@@ -111,7 +106,7 @@ def login(data: LoginRequest):
         user_id = result.user.id
         access_token = result.session.access_token
 
-        print(f"✅ Login success: {user_id}")
+        print(f"✅ Login success:  {user_id}")
 
         return {
             "message": "Login successful",
@@ -120,7 +115,7 @@ def login(data: LoginRequest):
             "supbasetoken": SUPABASE_KEY,
         }
     except AuthApiError as e:
-        print("❌ Login failed:", str(e))
+        print(f"❌ Login failed:  {str(e)}")
         raise HTTPException(status_code=401, detail=str(e))
 
 # ------------------ Email Verification ------------------
@@ -128,7 +123,6 @@ def login(data: LoginRequest):
 async def verify_email(token: str):
     try:
         email = s.loads(token, salt='email-verification', max_age=3600)  # Token valid for 1 hour
-        # Update user's email_verified status in Supabase
         response = supabase.table("profiles").update({"email_verified": True}).eq("email", email).execute()
         if response.data:
             return {"message": "Email verified successfully!"}
