@@ -477,13 +477,13 @@ async def rag_endpoint(
             print("AI response saved.")
 
             # Update request count
-            current_req = number_of_requests + 1
-            patch_url = f"{PROFILE_SUPABASE_REST_ENDPOINT}?id=eq.{user['id']}"
-            await client.patch(
-                patch_url,
-                headers=headers,
-                json={"number_of_requests": current_req}
-            )
+        current_req = number_of_requests + 1
+        patch_url = f"{PROFILE_SUPABASE_REST_ENDPOINT}?id=eq.{user['id']}"
+        await client.patch(
+            patch_url,
+            headers=headers,
+            json={"number_of_requests": current_req}
+        )
 
         return {"answer": ai_response}
 
@@ -491,10 +491,10 @@ async def rag_endpoint(
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
-        
-     finally:
+
+    finally:
         with active_users_lock:
-            active_users_count -= 1   
+            active_users_count -= 1  
 
 
 # ------------------ List In-Memory Sessions ------------------
