@@ -24,9 +24,11 @@ const LandingPage: React.FC = () => {
               <div className="p-2 bg-white rounded-xl shadow-lg">
                 <Scale className="w-8 h-8 text-amber-700" />
               </div>
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-white">Lex & Tech AI</h1>
-                <p className="text-sm text-amber-200 font-light mt-1">
+              <div className="flex flex-col">
+                <h1 className="text-2xl sm:text-3xl font-bold text-white">
+                  Lex & Tech AI
+                </h1>
+                <p className="text-sm text-white/70 font-light">
                   A Product By Lex & Tech Consulting Services
                 </p>
               </div>
