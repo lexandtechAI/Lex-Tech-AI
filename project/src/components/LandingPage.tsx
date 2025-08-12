@@ -29,7 +29,7 @@ const LandingPage: React.FC = () => {
                   Lex & Tech AI
                 </h1>
                 <p className="text-sm text-white/70 font-light">
-                  A Product By Lex & Tech Consulting Services
+                  A Product of Lex & Tech Consulting Services
                 </p>
               </div>
             </div>
