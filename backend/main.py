@@ -238,6 +238,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ✅ Root route at the bottom
+@app.get("/")
+async def root():
+    return {"message": "Lex & Tech API is live 🎉"}
 
 # ------------------ Input Schema ------------------
 class QueryInput(BaseModel):
