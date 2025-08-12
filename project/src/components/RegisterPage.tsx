@@ -48,7 +48,7 @@ const RegisterPage: React.FC = () => {
             <div className="p-3 bg-gradient-to-r from-amber-600 to-amber-700 rounded-xl shadow-lg">
               <Scale className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900">LexAdvisor</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Lex & Tech AI</h1>
           </Link>
           <h2 className="text-3xl font-bold text-gray-900">
             {registrationSuccess ? 'Check Your Email' : 'Create Your Account'}
