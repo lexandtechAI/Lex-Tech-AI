@@ -60,8 +60,13 @@ const LandingPage: React.FC = () => {
           <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center text-gray-900 mb-20">Specialized Legal Domains</h3>
           <div className="grid md:grid-cols-3 gap-10">
             <FeatureCard icon={Gavel} title="Bharatiya Nyaya Sanhita (BNS)" description="Get comprehensive guidance on the new criminal law framework that replaced the Indian Penal Code. Understand offenses, procedures, and legal implications with expert AI assistance." />
-            <FeatureCard icon={Shield} title="Data Protection & Privacy (DPDP)" description="Navigate India's Digital Personal Data Protection Act with expert insights on compliance, rights, and obligations for businesses and individuals in the digital age." />
+            <FeatureCard icon={Gavel} title="Bharatiya Nagarak Suraksha Sanhita (BNSS)" description="Detailed coverage of India's updated criminal procedure code, replacing the CrPC, with AI-powered explanations." />
+            <FeatureCard icon={Sheild} title="Bharatiya Sakshya Adhiniyam (BSA)" description="Understand India's updated evidence law, replacing the Indian Evidence Act, with clear AI-based insights." />
             <FeatureCard icon={Users} title="Child Protection (POCSO)" description="Understand the Protection of Children from Sexual Offences Act, including reporting mechanisms, legal procedures, and comprehensive support systems." />
+            <FeatureCard icon={Shield} title="Data Protection & Privacy (DPDP)" description="Navigate India's Digital Personal Data Protection Act with expert insights on compliance, rights, and obligations for businesses and individuals in the digital age." />
+            <FeatureCard icon={BookOpen} title="Other Key Acts" description="Information Technology Act, Arbitration and Conciliation Act, Limitation Act, Insolvency and Bankruptcy Act, and many more...." />
+          </div>
+          </div>
           </div>
         </div>
       </section>
