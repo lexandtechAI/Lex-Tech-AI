@@ -42,7 +42,7 @@ const LandingPage: React.FC = () => {
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-700 to-amber-600"> Indian Law</span>
         </h2>
         <p className="text-lg sm:text-xl text-gray-600 mb-12 max-w-4xl mx-auto leading-relaxed">
-          Navigate complex Indian legal frameworks with confidence. Lex & Tech AI provides expert guidance on Indian Law such as BNS, BNSS, DPDP, POCSO, and more, powered by advanced AI technology trusted by legal professionals.
+          Navigate complex Indian legal frameworks with confidence. Lex & Tech AI provides expert guidance on Indian Law such as BNS, BNSS, BSA, DPDP, POCSO, and more, powered by advanced AI technology trusted by legal professionals.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Link to="/register" className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-amber-600 to-amber-700 text-white font-semibold text-lg rounded-xl shadow-xl hover:from-amber-700 hover:to-amber-800 transition-all duration-200 transform hover:scale-105">
@@ -57,16 +57,40 @@ const LandingPage: React.FC = () => {
       {/* Use Cases */}
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center text-gray-900 mb-20">Specialized Legal Domains</h3>
+          <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center text-gray-900 mb-20">
+            Specialized Legal Domains
+          </h3>
           <div className="grid md:grid-cols-3 gap-10">
-            <FeatureCard icon={Gavel} title="Bharatiya Nyaya Sanhita (BNS)" description="Get comprehensive guidance on the new criminal law framework that replaced the Indian Penal Code. Understand offenses, procedures, and legal implications with expert AI assistance." />
-            <FeatureCard icon={Gavel} title="Bharatiya Nagarak Suraksha Sanhita (BNSS)" description="Detailed coverage of India's updated criminal procedure code, replacing the CrPC, with AI-powered explanations." />
-            <FeatureCard icon={Sheild} title="Bharatiya Sakshya Adhiniyam (BSA)" description="Understand India's updated evidence law, replacing the Indian Evidence Act, with clear AI-based insights." />
-            <FeatureCard icon={Users} title="Child Protection (POCSO)" description="Understand the Protection of Children from Sexual Offences Act, including reporting mechanisms, legal procedures, and comprehensive support systems." />
-            <FeatureCard icon={Shield} title="Data Protection & Privacy (DPDP)" description="Navigate India's Digital Personal Data Protection Act with expert insights on compliance, rights, and obligations for businesses and individuals in the digital age." />
-            <FeatureCard icon={BookOpen} title="Other Key Acts" description="Information Technology Act, Arbitration and Conciliation Act, Limitation Act, Insolvency and Bankruptcy Act, and many more...." />
-          </div>
-          </div>
+            <FeatureCard 
+              icon={Gavel} 
+              title="Bharatiya Nyaya Sanhita (BNS)" 
+              description="Get comprehensive guidance on the new criminal law framework that replaced the Indian Penal Code. Understand offenses, procedures, and legal implications with expert AI assistance." 
+            />
+            <FeatureCard 
+              icon={Gavel} 
+              title="Bharatiya Nagarik Suraksha Sanhita (BNSS)" 
+              description="Detailed coverage of India's updated criminal procedure code, replacing the CrPC, with AI-powered explanations." 
+            />
+            <FeatureCard 
+              icon={Shield} 
+              title="Bharatiya Sakshya Adhiniyam (BSA)" 
+              description="Understand India's updated evidence law, replacing the Indian Evidence Act, with clear AI-based insights." 
+            />
+            <FeatureCard 
+              icon={Users} 
+              title="Child Protection (POCSO)" 
+              description="Understand the Protection of Children from Sexual Offences Act, including reporting mechanisms, legal procedures, and comprehensive support systems." 
+            />
+            <FeatureCard 
+              icon={Shield} 
+              title="Data Protection & Privacy (DPDP)" 
+              description="Navigate India's Digital Personal Data Protection Act with expert insights on compliance, rights, and obligations for businesses and individuals in the digital age." 
+            />
+            <FeatureCard 
+              icon={BookOpen} 
+              title="Other Key Acts" 
+              description="Information Technology Act, Arbitration and Conciliation Act, Limitation Act, Insolvency and Bankruptcy Act, and many more..." 
+            />
           </div>
         </div>
       </section>
@@ -74,18 +98,34 @@ const LandingPage: React.FC = () => {
       {/* Features */}
       <section className="py-24 bg-gradient-to-br from-gray-50 to-amber-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center text-gray-900 mb-20">Why Choose Lex & Tech AI?</h3>
+          <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center text-gray-900 mb-20">
+            Why Choose Lex & Tech AI?
+          </h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10 text-center">
-            <FeatureCard icon={BookOpen} title="Expert Knowledge Base" description="Access comprehensive legal databases and the latest amendments in Indian law with real-time updates." />
-            <FeatureCard icon={Scale} title="Accurate Legal Guidance" description="AI-powered responses based on verified legal sources, case precedents, and expert legal analysis." />
-            <FeatureCard icon={Shield} title="Secure & Confidential" description="Your legal queries are handled with utmost privacy, security, and professional confidentiality." />
+            <FeatureCard 
+              icon={BookOpen} 
+              title="Expert Knowledge Base" 
+              description="Access comprehensive legal databases and the latest amendments in Indian law with real-time updates." 
+            />
+            <FeatureCard 
+              icon={Scale} 
+              title="Accurate Legal Guidance" 
+              description="AI-powered responses based on verified legal sources, case precedents, and expert legal analysis." 
+            />
+            <FeatureCard 
+              icon={Shield} 
+              title="Secure & Confidential" 
+              description="Your legal queries are handled with utmost privacy, security, and professional confidentiality." 
+            />
           </div>
         </div>
       </section>
 
       {/* CTA */}
       <section className="py-24 bg-gradient-to-r from-amber-700 via-amber-600 to-amber-500 text-center">
-        <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-8">Ready to Get Legal Clarity?</h3>
+        <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-8">
+          Ready to Get Legal Clarity?
+        </h3>
         <p className="text-lg sm:text-xl text-amber-100 mb-12 leading-relaxed max-w-3xl mx-auto">
           Join thousands of legal professionals, students, and individuals who trust Lex & Tech AI for accurate, reliable legal guidance across all domains of Indian law.
         </p>
