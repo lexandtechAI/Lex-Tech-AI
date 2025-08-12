@@ -57,11 +57,11 @@ const ContactPage: React.FC = () => {
       <header className="bg-gradient-to-r from-amber-600 via-amber-700 to-amber-800 shadow-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
-            <Link to="/" className="flex items-center space-x-3" aria-label="LexAdvisor Home">
+            <Link to="/" className="flex items-center space-x-3" aria-label="Lex & Tech AI Home">
               <div className="p-2 bg-white rounded-xl shadow-lg">
                 <Scale className="w-8 h-8 text-amber-700" />
               </div>
-              <h1 className="text-3xl font-bold text-white">LexAdvisor</h1>
+              <h1 className="text-3xl font-bold text-white">Lex & Tech AI</h1>
             </Link>
             <div className="flex space-x-4">
               <Link
@@ -242,7 +242,7 @@ const ContactPage: React.FC = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h3 className="text-4xl font-bold mb-6">Ready to Get Started?</h3>
           <p className="text-xl mb-8">
-            While you wait for our response, why not try our free plan and experience LexAdvisor today?
+            While you wait for our response, why not try our free plan and experience Lex & Tech AI today?
           </p>
           <Link
             to="/pricing"
