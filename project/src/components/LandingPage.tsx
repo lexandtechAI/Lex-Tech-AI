@@ -42,7 +42,7 @@ const LandingPage: React.FC = () => {
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-700 to-amber-600"> Indian Law</span>
         </h2>
         <p className="text-lg sm:text-xl text-gray-600 mb-12 max-w-4xl mx-auto leading-relaxed">
-          Navigate complex Indian legal frameworks with confidence. Lex & Tech AI provides expert guidance on INDIAN Law such as BNS, BNSS, DPDP, POCSO, and more, powered by advanced AI technology trusted by legal professionals.
+          Navigate complex Indian legal frameworks with confidence. Lex & Tech AI provides expert guidance on Indian Law such as BNS, BNSS, DPDP, POCSO, and more, powered by advanced AI technology trusted by legal professionals.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Link to="/register" className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-amber-600 to-amber-700 text-white font-semibold text-lg rounded-xl shadow-xl hover:from-amber-700 hover:to-amber-800 transition-all duration-200 transform hover:scale-105">
