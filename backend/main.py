@@ -345,7 +345,7 @@ async def rag_endpoint(
         if (
             subscription == "free"
             and number_of_requests is not None
-            and number_of_requests > 4
+            and number_of_requests > 2
         ):
             return {
                 "answer": "Your number of requests is expired. Please upgrade to premium"
