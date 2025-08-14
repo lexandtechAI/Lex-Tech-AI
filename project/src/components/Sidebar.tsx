@@ -80,15 +80,15 @@ const Sidebar: React.FC<SidebarProps> = ({
       )}
 
       <div
-        className={`fixed inset-y-0 left-0 z-50 bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white transform transition-all duration-300 ease-in-out ${isOpen ? 'translate-x-0 w-80' : '-translate-x-full w-0'} md:relative ${isOpen ? 'md:w-80' : 'md:w-16'}`}
+        className={`fixed inset-y-0 left-0 z-50 bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white transform transition-all duration-300 ease-in-out ${isOpen ? 'translate-x-0 w-80' : '-translate-x-full'} md:relative md:translate-x-0 ${isOpen ? 'md:w-80' : 'md:w-16'}`}
       >
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between p-6 border-b border-gray-700">
-            <div className="flex items-center space-x-3 overflow-hidden">
+            <div className={`flex items-center space-x-3 overflow-hidden ${!isOpen && 'hidden'}`}>
               <div className="p-2 bg-gradient-to-r from-amber-600 to-amber-700 rounded-xl shadow-lg flex-shrink-0">
                 <Scale className="w-6 h-6 text-white" />
               </div>
-              <h1 className={`text-xl font-bold ${!isOpen && 'hidden'}`}>Lex & Tech AI</h1>
+              <h1 className="text-xl font-bold">Lex & Tech AI</h1>
             </div>
             <button
               onClick={onToggle}
@@ -158,14 +158,14 @@ const Sidebar: React.FC<SidebarProps> = ({
                   <div className="text-sm font-medium truncate">{user?.email || 'User'}</div>
                 </div>}
               </button>
-              <button
+              {isOpen && <button
                 onClick={onLogout}
                 className={`p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-xl transition-colors flex-shrink-0 ${!isOpen && 'flex flex-col items-center space-y-1'}`}
                 title="Logout"
               >
                 <LogOut className="w-5 h-5" />
-                {isOpen && <span className="ml-2">Logout</span>}
-              </button>
+                <span className="ml-2">Logout</span>
+              </button>}
             </div>
           </div>
         </div>
