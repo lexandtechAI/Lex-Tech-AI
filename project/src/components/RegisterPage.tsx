@@ -41,27 +41,27 @@ const RegisterPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-gray-50 flex items-center justify-center px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+      <div className="max-w-md w-full space-y-8 p-4 sm:p-0">
         {/* Header */}
         <div className="text-center">
           <Link to="/" className="flex items-center justify-center space-x-3 mb-8">
             <div className="p-3 bg-gradient-to-r from-amber-600 to-amber-700 rounded-xl shadow-lg">
               <Scale className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900">Lex & Tech AI</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Lex & Tech AI</h1>
           </Link>
-          <h2 className="text-3xl font-bold text-gray-900">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
             {registrationSuccess ? 'Check Your Email' : 'Create Your Account'}
           </h2>
           <p className="mt-3 text-gray-600 text-lg">
             {registrationSuccess
-              ? 'We\'ve sent a verification link to your email address.'
+              ? "We've sent a verification link to your email address."
               : 'Join Lex & Tech AI to access legal guidance'}
           </p>
         </div>
 
         {/* Form or Success Message */}
-        <div className="bg-white p-10 rounded-2xl shadow-xl border border-amber-100">
+        <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-xl border border-amber-100">
           {registrationSuccess ? (
             <div className="text-center">
               <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
@@ -100,7 +100,7 @@ const RegisterPage: React.FC = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="block w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200"
+                    className="block w-full pl-12 pr-4 py-3 sm:py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter your email"
                   />
                 </div>
@@ -120,7 +120,7 @@ const RegisterPage: React.FC = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="block w-full pl-12 pr-14 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200"
+                    className="block w-full pl-12 pr-14 py-3 sm:py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200"
                     placeholder="Create a password"
                   />
                   <button
@@ -151,7 +151,7 @@ const RegisterPage: React.FC = () => {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
-                    className="block w-full pl-12 pr-14 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200"
+                    className="block w-full pl-12 pr-14 py-3 sm:py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200"
                     placeholder="Confirm your password"
                   />
                   <button
@@ -171,7 +171,7 @@ const RegisterPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-lg text-sm font-semibold text-white bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105"
+                className="w-full flex justify-center py-3 sm:py-4 px-4 border border-transparent rounded-xl shadow-lg text-sm font-semibold text-white bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105"
               >
                 {loading ? 'Creating Account...' : 'Create Account'}
               </button>

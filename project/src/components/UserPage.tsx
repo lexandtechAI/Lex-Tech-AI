@@ -66,14 +66,14 @@ const UserPage: React.FC = () => {
       {/* Header */}
       <header className="bg-gradient-to-r from-amber-600 via-amber-700 to-amber-800 shadow-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <Link to="/" className="flex items-center space-x-3" aria-label="Lex & Tech AI Home">
+          <div className="flex flex-col sm:flex-row justify-between items-center py-6">
+            <Link to="/" className="flex items-center space-x-3 mb-4 sm:mb-0" aria-label="Lex & Tech AI Home">
               <div className="p-2 bg-white rounded-xl shadow-lg">
                 <Scale className="w-8 h-8 text-amber-700" />
               </div>
-              <h1 className="text-3xl font-bold text-white">Lex & Tech AI</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white">Lex & Tech AI</h1>
             </Link>
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 mt-4 sm:mt-0">
               <div className="flex items-center space-x-3 text-white">
                 <User className="w-6 h-6" />
                 <span className="font-semibold">{profileData.full_name}</span>
@@ -90,10 +90,10 @@ const UserPage: React.FC = () => {
       {/* Hero */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 text-center">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-5xl font-bold text-gray-900 mb-6">
+          <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
             Welcome Back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-700 to-amber-600">{profileData.full_name}</span>
           </h2>
-          <p className="text-xl text-gray-600 mb-12">
+          <p className="text-lg sm:text-xl text-gray-600 mb-12">
             Your AI legal assistant is ready to help. Continue your legal research journey.
           </p>
         </div>
@@ -103,7 +103,7 @@ const UserPage: React.FC = () => {
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl mx-auto">
           {/* Account Settings */}
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8 hover:shadow-2xl transition flex flex-col">
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-6 sm:p-8 hover:shadow-2xl transition flex flex-col">
             <div className="text-center mb-6">
               <div className="w-16 h-16 bg-gradient-to-r from-amber-600 to-amber-700 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Settings className="w-8 h-8 text-white" />
@@ -112,33 +112,33 @@ const UserPage: React.FC = () => {
               <p className="text-gray-600">Manage your profile and preferences</p>
             </div>
             <div className="space-y-3 mb-6 flex-grow">
-              <div className="p-3 bg-gray-50 rounded-lg flex justify-between items-center">
+              <div className="p-3 bg-gray-50 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center">
                 <span className="text-sm font-medium text-gray-700">Name</span>
-                <span className="text-sm text-gray-600">{profileData.full_name}</span>
+                <span className="text-sm text-gray-600 mt-1 sm:mt-0">{profileData.full_name}</span>
               </div>
-              <div className="p-3 bg-gray-50 rounded-lg flex justify-between items-center">
+              <div className="p-3 bg-gray-50 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center">
                 <span className="text-sm font-medium text-gray-700">Email</span>
-                <span className="text-sm text-gray-600">{profileData.email}</span>
+                <span className="text-sm text-gray-600 mt-1 sm:mt-0">{profileData.email}</span>
               </div>
-              <div className="p-3 bg-gray-50 rounded-lg flex justify-between items-center">
+              <div className="p-3 bg-gray-50 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center">
                 <span className="text-sm font-medium text-gray-700">Phone</span>
-                <span className="text-sm text-gray-600">{profileData.phone}</span>
+                <span className="text-sm text-gray-600 mt-1 sm:mt-0">{profileData.phone}</span>
               </div>
-              <div className="p-3 bg-gray-50 rounded-lg flex justify-between items-center">
+              <div className="p-3 bg-gray-50 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center">
                 <span className="text-sm font-medium text-gray-700">Organization</span>
-                <span className="text-sm text-gray-600">{profileData.organization}</span>
+                <span className="text-sm text-gray-600 mt-1 sm:mt-0">{profileData.organization}</span>
               </div>
-              <div className="p-3 bg-gray-50 rounded-lg flex justify-between items-center">
+              <div className="p-3 bg-gray-50 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center">
                 <span className="text-sm font-medium text-gray-700">Plan</span>
-                <span className="text-sm text-amber-700 font-semibold">{profileData.subscriptions}</span>
+                <span className="text-sm text-amber-700 font-semibold mt-1 sm:mt-0">{profileData.subscriptions}</span>
               </div>
-              <div className="p-3 bg-gray-50 rounded-lg flex justify-between items-center">
+              <div className="p-3 bg-gray-50 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center">
                 <span className="text-sm font-medium text-gray-700">Number of Requests</span>
-                <span className="text-sm text-amber-700 font-semibold">{profileData.number_of_requests}</span>
+                <span className="text-sm text-amber-700 font-semibold mt-1 sm:mt-0">{profileData.number_of_requests}</span>
               </div>
-              <div className="p-3 bg-gray-50 rounded-lg flex justify-between items-center">
+              <div className="p-3 bg-gray-50 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center">
                 <span className="text-sm font-medium text-gray-700">Member since</span>
-                <span className="text-sm text-gray-600">{profileData.created_at}</span>
+                <span className="text-sm text-gray-600 mt-1 sm:mt-0">{profileData.created_at}</span>
               </div>
             </div>
             <button 
@@ -154,8 +154,8 @@ const UserPage: React.FC = () => {
       {/* Quick Actions */}
       <section className="py-20 bg-gradient-to-r from-amber-700 via-amber-600 to-amber-500 text-center text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h3 className="text-4xl font-bold mb-6">Ready to Continue Your Legal Research?</h3>
-          <p className="text-xl mb-8">
+          <h3 className="text-3xl sm:text-4xl font-bold mb-6">Ready to Continue Your Legal Research?</h3>
+          <p className="text-lg sm:text-xl mb-8">
             Ask your legal questions and get comprehensive, AI-powered answers instantly.
           </p>
           <button className="inline-flex items-center px-8 py-4 bg-white text-amber-700 font-semibold text-lg rounded-xl shadow-xl hover:bg-gray-50 transform hover:scale-105">
@@ -250,7 +250,7 @@ const UserPage: React.FC = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="flex space-x-3 p-6 border-t border-gray-200">
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 p-6 border-t border-gray-200">
               <button
                 onClick={handleCancel}
                 className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition"

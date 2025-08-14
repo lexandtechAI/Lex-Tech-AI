@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Scale, Shield, Users, BookOpen, ArrowRight, Gavel } from 'lucide-react';
+import { Scale, Shield, Users, BookOpen, ArrowRight, Gavel, Menu, X } from 'lucide-react';
 
 // Reusable Feature Card
 const FeatureCard = ({ icon: Icon, title, description }: { icon: any; title: string; description: string }) => (
@@ -14,6 +14,8 @@ const FeatureCard = ({ icon: Icon, title, description }: { icon: any; title: str
 );
 
 const LandingPage: React.FC = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-gray-50">
       {/* Header */}
@@ -33,13 +35,27 @@ const LandingPage: React.FC = () => {
                 </p>
               </div>
             </div>
-            <div className="flex space-x-4">
+            <div className="hidden sm:flex sm:space-x-4">
               <Link to="/pricing" className="px-6 py-3 text-white font-semibold rounded-lg hover:bg-white/10 transition-all duration-200">Pricing</Link>
               <Link to="/login" className="px-6 py-3 bg-white text-amber-700 font-semibold rounded-lg shadow-lg hover:bg-gray-50 transition-all duration-200">Login</Link>
               <Link to="/register" className="px-6 py-3 bg-black text-white font-semibold rounded-lg shadow-lg hover:bg-gray-900 transition-all duration-200">Sign Up</Link>
             </div>
+            <div className="sm:hidden">
+              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-white">
+                {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
           </div>
         </div>
+        {mobileMenuOpen && (
+          <div className="sm:hidden bg-amber-700">
+            <div className="flex flex-col space-y-2 p-4">
+              <Link to="/pricing" className="px-6 py-3 text-white font-semibold rounded-lg hover:bg-white/10 transition-all duration-200 text-center">Pricing</Link>
+              <Link to="/login" className="px-6 py-3 bg-white text-amber-700 font-semibold rounded-lg shadow-lg hover:bg-gray-50 transition-all duration-200 text-center">Login</Link>
+              <Link to="/register" className="px-6 py-3 bg-black text-white font-semibold rounded-lg shadow-lg hover:bg-gray-900 transition-all duration-200 text-center">Sign Up</Link>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Hero Section */}
@@ -52,10 +68,10 @@ const LandingPage: React.FC = () => {
           Navigate complex Indian legal frameworks with confidence. Lex & Tech AI provides expert guidance on Indian Law such as BNS, BNSS, BSA, DPDP, POCSO, and more, powered by advanced AI technology trusted by legal professionals.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Link to="/register" className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-amber-600 to-amber-700 text-white font-semibold text-lg rounded-xl shadow-xl hover:from-amber-700 hover:to-amber-800 transition-all duration-200 transform hover:scale-105">
+          <Link to="/register" className="inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-amber-600 to-amber-700 text-white font-semibold text-lg rounded-xl shadow-xl hover:from-amber-700 hover:to-amber-800 transition-all duration-200 transform hover:scale-105">
             Get Started Free <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
-          <Link to="/pricing" className="inline-flex items-center px-8 py-4 bg-white text-amber-700 font-semibold text-lg rounded-xl shadow-lg border-2 border-amber-200 hover:bg-amber-50 transition-all duration-200">
+          <Link to="/pricing" className="inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-white text-amber-700 font-semibold text-lg rounded-xl shadow-lg border-2 border-amber-200 hover:bg-amber-50 transition-all duration-200">
             View Pricing
           </Link>
         </div>
@@ -67,7 +83,7 @@ const LandingPage: React.FC = () => {
           <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center text-gray-900 mb-20">
             Specialized Legal Domains
           </h3>
-          <div className="grid md:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             <FeatureCard 
               icon={Gavel} 
               title="Bharatiya Nyaya Sanhita (BNS)" 
@@ -108,7 +124,7 @@ const LandingPage: React.FC = () => {
           <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center text-gray-900 mb-20">
             Why Choose Lex & Tech AI?
           </h3>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10 text-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 text-center">
             <FeatureCard 
               icon={BookOpen} 
               title="Expert Knowledge Base" 
@@ -137,10 +153,10 @@ const LandingPage: React.FC = () => {
           Join thousands of legal professionals, students, and individuals who trust Lex & Tech AI for accurate, reliable legal guidance across all domains of Indian law.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Link to="/register" className="inline-flex items-center px-8 py-4 bg-white text-amber-700 font-semibold text-lg rounded-xl shadow-xl hover:bg-gray-50 transition-all duration-200 transform hover:scale-105">
+          <Link to="/register" className="inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-white text-amber-700 font-semibold text-lg rounded-xl shadow-xl hover:bg-gray-50 transition-all duration-200 transform hover:scale-105">
             Start Your Free Trial <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
-          <Link to="/pricing" className="inline-flex items-center px-8 py-4 bg-black text-white font-semibold text-lg rounded-xl shadow-xl hover:bg-gray-900 transition-all duration-200">
+          <Link to="/pricing" className="inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-black text-white font-semibold text-lg rounded-xl shadow-xl hover:bg-gray-900 transition-all duration-200">
             View Pricing Plans
           </Link>
         </div>
@@ -156,7 +172,7 @@ const LandingPage: React.FC = () => {
             <span className="text-2xl sm:text-3xl font-bold">Lex & Tech AI</span>
           </div>
           <p className="text-gray-400 mb-6 text-lg">Empowering legal clarity through AI-powered assistance</p>
-          <div className="flex justify-center space-x-6 sm:space-x-8 mb-8 text-sm sm:text-base">
+          <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6 md:space-x-8 mb-8 text-sm sm:text-base">
             <Link to="/pricing" className="text-gray-400 hover:text-white">Pricing</Link>
             <Link to="/contact" className="text-gray-400 hover:text-white">Contact</Link>
             <Link to="/login" className="text-gray-400 hover:text-white">Login</Link>

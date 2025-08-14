@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Scale, Mail, Phone, MapPin, Send, CheckCircle, User, Building, MessageSquare } from 'lucide-react';
+import { Scale, Mail, Phone, MapPin, Send, CheckCircle, User, Building, MessageSquare, Menu, X } from 'lucide-react';
 
 import { ApiClient } from '../utils/api';
 
@@ -16,6 +16,7 @@ const ContactPage: React.FC = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -61,9 +62,9 @@ const ContactPage: React.FC = () => {
               <div className="p-2 bg-white rounded-xl shadow-lg">
                 <Scale className="w-8 h-8 text-amber-700" />
               </div>
-              <h1 className="text-3xl font-bold text-white">Lex & Tech AI</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white">Lex & Tech AI</h1>
             </Link>
-            <div className="flex space-x-4">
+            <div className="hidden sm:flex sm:space-x-4">
               <Link
                 to="/pricing"
                 className="px-6 py-3 bg-white text-amber-700 font-semibold rounded-lg shadow-lg hover:bg-gray-50 transition-all duration-200"
@@ -71,17 +72,34 @@ const ContactPage: React.FC = () => {
                 Back to Pricing
               </Link>
             </div>
+            <div className="sm:hidden">
+              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-white">
+                {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
           </div>
         </div>
+        {mobileMenuOpen && (
+          <div className="sm:hidden bg-amber-700">
+            <div className="flex flex-col space-y-2 p-4">
+              <Link
+                to="/pricing"
+                className="px-6 py-3 bg-white text-amber-700 font-semibold rounded-lg shadow-lg hover:bg-gray-50 transition-all duration-200 text-center"
+              >
+                Back to Pricing
+              </Link>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Hero */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 text-center">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-5xl font-bold text-gray-900 mb-6">
+          <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
             Get in <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-700 to-amber-600">Touch</span>
           </h2>
-          <p className="text-xl text-gray-600 mb-12">
+          <p className="text-lg sm:text-xl text-gray-600 mb-12">
             Ready to transform your legal research? Contact us for a customized solution that fits your needs.
           </p>
         </div>
@@ -90,12 +108,12 @@ const ContactPage: React.FC = () => {
       {/* Contact Form */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl mx-auto">
-          <div className="bg-white rounded-2xl shadow-xl p-8 lg:p-10">
+          <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 lg:p-10">
             {!isSubmitted ? (
               <>
-                <h3 className="text-3xl font-bold text-gray-900 mb-8">Send us a Message</h3>
+                <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-8">Send us a Message</h3>
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         <User className="w-4 h-4 inline mr-2" />
@@ -128,7 +146,7 @@ const ContactPage: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         <Phone className="w-4 h-4 inline mr-2" />
@@ -240,8 +258,8 @@ const ContactPage: React.FC = () => {
       {/* CTA */}
       <section className="py-20 bg-gradient-to-r from-amber-700 via-amber-600 to-amber-500 text-center text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h3 className="text-4xl font-bold mb-6">Ready to Get Started?</h3>
-          <p className="text-xl mb-8">
+          <h3 className="text-3xl sm:text-4xl font-bold mb-6">Ready to Get Started?</h3>
+          <p className="text-lg sm:text-xl mb-8">
             While you wait for our response, why not try our free plan and experience Lex & Tech AI today?
           </p>
           <Link

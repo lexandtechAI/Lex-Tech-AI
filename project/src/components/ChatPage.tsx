@@ -24,7 +24,7 @@ const ChatPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
   const [pdfUploaded, setPdfUploaded] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [showTyping, setShowTyping] = useState(false);
@@ -81,13 +81,17 @@ const ChatPage: React.FC = () => {
 
   const handleSessionSelect = (sessionId: string) => {
     loadChatHistory(sessionId);
-    setSidebarOpen(false);
+    if (window.innerWidth < 768) {
+      setSidebarOpen(false);
+    }
   };
 
   const handleNewChat = () => {
     setMessages([]);
     updateCurrentSession(null);
-    setSidebarOpen(false);
+    if (window.innerWidth < 768) {
+      setSidebarOpen(false);
+    }
     setPdfUploaded(false);
   };
 
@@ -209,26 +213,26 @@ const ChatPage: React.FC = () => {
 
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shadow-sm">
-          <div className="flex items-center space-x-4">
+        <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4 flex items-center justify-between shadow-sm">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             <button
               onClick={() => setSidebarOpen(true)}
               className="md:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors"
             >
               <Menu className="w-5 h-5" />
             </button>
-            <h1 className="text-xl font-semibold text-gray-900">
+            <h1 className="text-lg sm:text-xl font-semibold text-gray-900">
               {currentSessionId ? 'Legal Assistant' : 'New Chat'}
             </h1>
           </div>
 
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2 sm:space-x-3">
             <label
               htmlFor="pdf-upload"
-              className="flex items-center text-sm text-blue-600 border border-blue-500 px-3 py-1 rounded-xl hover:bg-blue-50 cursor-pointer"
+              className="flex items-center text-sm text-blue-600 border border-blue-500 px-2 sm:px-3 py-1 rounded-xl hover:bg-blue-50 cursor-pointer"
             >
               <Paperclip className="w-4 h-4 mr-1" />
-              Upload PDF
+              <span className="hidden sm:inline">Upload PDF</span>
             </label>
             <input
               id="pdf-upload"
@@ -241,27 +245,27 @@ const ChatPage: React.FC = () => {
             {pdfUploaded && currentSessionId && (
               <button
                 onClick={handleClearPdf}
-                className="text-sm text-red-600 border border-red-500 px-3 py-1 rounded-xl hover:bg-red-50 flex items-center space-x-1"
+                className="text-sm text-red-600 border border-red-500 px-2 sm:px-3 py-1 rounded-xl hover:bg-red-50 flex items-center space-x-1"
               >
                 <Trash2 className="w-4 h-4" />
-                <span>Clear PDF</span>
+                <span className="hidden sm:inline">Clear PDF</span>
               </button>
             )}
-            <div className="text-sm text-gray-500 font-medium">
+            <div className="hidden sm:block text-sm text-gray-500 font-medium">
               Powered by Lex & Tech AI
             </div>
           </div>
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
           {messages.map((msg) => (
             <div
               key={msg.id}
-              className={`mb-4 ${msg.is_user ? 'flex justify-end' : 'flex justify-start'}`}
+              className={`mb-4 flex ${msg.is_user ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`max-w-3xl px-5 py-3 rounded-2xl text-sm border ${
+                className={`max-w-full sm:max-w-3xl px-4 sm:px-5 py-3 rounded-2xl text-sm border ${
                   msg.is_user
                     ? 'bg-[#f0f0f0] text-gray-900 border-[#dfe1eb]'
                     : 'bg-white text-gray-900 border-gray-200 shadow-sm'
@@ -306,11 +310,11 @@ const ChatPage: React.FC = () => {
         {/* Input */}
         <form
           onSubmit={handleSendMessage}
-          className="border-t border-gray-200 p-4 bg-white flex items-center"
+          className="border-t border-gray-200 p-2 sm:p-4 bg-white flex items-center"
         >
           <input
             type="text"
-            className="flex-1 border rounded-xl px-4 py-2 text-sm focus:outline-none"
+            className="flex-1 border rounded-xl px-4 py-2 text-sm focus:outline-none w-full"
             placeholder="Ask a legal question..."
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
@@ -318,7 +322,7 @@ const ChatPage: React.FC = () => {
           />
           <button
             type="submit"
-            className="ml-3 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm"
+            className="ml-2 sm:ml-3 bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-2 rounded-xl text-sm"
             disabled={loading}
           >
             <Send className="w-4 h-4" />

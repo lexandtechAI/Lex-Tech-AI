@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Scale, Check, ArrowRight, Star } from 'lucide-react';
+import { Scale, Check, ArrowRight, Star, Menu, X } from 'lucide-react';
 
 const PricingPage: React.FC = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-gray-50">
       {/* Header */}
@@ -13,9 +15,9 @@ const PricingPage: React.FC = () => {
               <div className="p-2 bg-white rounded-xl shadow-lg">
                 <Scale className="w-8 h-8 text-amber-700" />
               </div>
-              <h1 className="text-3xl font-bold text-white">Lex & Tech AI</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white">Lex & Tech AI</h1>
             </Link>
-            <div className="flex space-x-4">
+            <div className="hidden sm:flex sm:space-x-4">
               <Link
                 to="/login"
                 className="px-6 py-3 bg-white text-amber-700 font-semibold rounded-lg shadow-lg hover:bg-gray-50 transition-all duration-200"
@@ -29,17 +31,40 @@ const PricingPage: React.FC = () => {
                 Sign Up
               </Link>
             </div>
+            <div className="sm:hidden">
+              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-white">
+                {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
           </div>
         </div>
+        {mobileMenuOpen && (
+          <div className="sm:hidden bg-amber-700">
+            <div className="flex flex-col space-y-2 p-4">
+              <Link
+                to="/login"
+                className="px-6 py-3 bg-white text-amber-700 font-semibold rounded-lg shadow-lg hover:bg-gray-50 transition-all duration-200 text-center"
+              >
+                Login
+              </Link>
+              <Link
+                to="/register"
+                className="px-6 py-3 bg-black text-white font-semibold rounded-lg shadow-lg hover:bg-gray-900 transition-all duration-200 text-center"
+              >
+                Sign Up
+              </Link>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Hero */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 text-center">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-5xl font-bold text-gray-900 mb-6">
+          <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
             Choose Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-700 to-amber-600">Legal Plan</span>
           </h2>
-          <p className="text-xl text-gray-600 mb-12">
+          <p className="text-lg sm:text-xl text-gray-600 mb-12">
             Get access to India's most comprehensive AI legal assistant. Choose the plan that fits your needs.
           </p>
         </div>
@@ -47,7 +72,7 @@ const PricingPage: React.FC = () => {
 
       {/* Pricing Cards */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 lg:gap-12">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
           {/* Free Plan */}
           <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8 lg:p-10 hover:shadow-2xl transition flex flex-col">
             <div className="text-center mb-8">
@@ -109,8 +134,8 @@ const PricingPage: React.FC = () => {
       {/* CTA */}
       <section className="py-20 bg-gradient-to-r from-amber-700 via-amber-600 to-amber-500 text-center text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h3 className="text-4xl font-bold mb-6">Ready to Transform Your Legal Research?</h3>
-          <p className="text-xl mb-8">
+          <h3 className="text-3xl sm:text-4xl font-bold mb-6">Ready to Transform Your Legal Research?</h3>
+          <p className="text-lg sm:text-xl mb-8">
             Join thousands of legal professionals who trust Lex & Tech AI for accurate, comprehensive legal guidance.
           </p>
           <Link
