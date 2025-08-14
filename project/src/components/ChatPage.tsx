@@ -199,7 +199,7 @@ const ChatPage: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 font-sans text-[15px]">
+    <div className="flex h-screen bg-gray-50 font-sans text-[15px] overflow-hidden">
       <Sidebar
         sessions={sessions}
         currentSessionId={currentSessionId}
@@ -211,9 +211,9 @@ const ChatPage: React.FC = () => {
         onDeleteSession={handleDeleteSession}
       />
 
-      <div className={`flex-1 flex flex-col transition-all duration-300 ease-in-out ${sidebarOpen && window.innerWidth < 768 ? 'ml-80' : ''}`}>
+      <div className="flex-1 flex flex-col h-screen">
         {/* Header */}
-        <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4 flex items-center justify-between shadow-sm">
+        <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4 flex items-center justify-between shadow-sm flex-shrink-0">
           <div className="flex items-center space-x-2 sm:space-x-4">
             <button
               onClick={() => setSidebarOpen(true)}
@@ -310,7 +310,7 @@ const ChatPage: React.FC = () => {
         {/* Input */}
         <form
           onSubmit={handleSendMessage}
-          className="border-t border-gray-200 p-2 sm:p-4 bg-white flex items-center"
+          className="border-t border-gray-200 p-2 sm:p-4 bg-white flex items-center flex-shrink-0"
         >
           <input
             type="text"
