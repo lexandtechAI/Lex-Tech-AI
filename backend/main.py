@@ -137,6 +137,7 @@ Your guidance must be:
 - Cited with relevant legal sections from:
   - Bharatiya Nyaya Sanhita (BNS), 2023
   - Bharatiya Nagarik Suraksha Sanhita (BNSS), 2023
+  - Bharatiya Sakshya Adhiniyam (BSA), 2023
   - Digital Personal Data Protection (DPDP) Act, 2023
   - Information Technology (IT) Act, 2000 (as amended)
   - Protection of Children from Sexual Offences (POCSO) Act, 2012
