@@ -190,7 +190,7 @@ Answer as Lex & Tech AI:
 
 # ------------------ LLM Setup (using official Google library) ------------------
 genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
-llm = genai.GenerativeModel('models/gemini-pro') # Using full model path for compatibility
+llm = genai.GenerativeModel('gemini-1.5-pro-latest') # Using the latest powerful model
 
 
 # ------------------ Memory Store ------------------
