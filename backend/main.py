@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-import os, re
+import os, re, shutil
 import httpx
 import jwt
 import fitz  # PyMuPDF
@@ -66,19 +66,11 @@ embeddings = GoogleGenerativeAIEmbeddings(
     google_api_key=os.environ["GOOGLE_API_KEY"]
 )
 
-# Check if the FAISS index already exists
-if os.path.exists(FAISS_INDEX_PATH):
-    print("✅ Loading existing FAISS index from disk...")
-    db = FAISS.load_local(
-        FAISS_INDEX_PATH,
-        embeddings,
-        allow_dangerous_deserialization=True
-    )
-else:
-    print("⚠ No FAISS index found. Building new index from source documents...")
+# Helper function to build a new FAISS index
+def build_new_index():
+    print("⚠ Building new FAISS index from source documents...")
     print("This will only happen once and may take a few minutes.")
 
-    # Path to source documents on persistent disk
     SOURCE_DOCS_PATH = os.path.join(DATA_DIR, "source_documents")
 
     if not os.path.exists(SOURCE_DOCS_PATH) or not os.listdir(SOURCE_DOCS_PATH):
@@ -87,34 +79,47 @@ else:
             "Please upload your documents first."
         )
 
-    # Load documents from directory
     loader = DirectoryLoader(
         SOURCE_DOCS_PATH,
-        glob="/*.pdf",  # Load all PDF files in subdirectories
+        glob="/*.pdf",
         loader_cls=PyPDFLoader,
         show_progress=True,
-        use_multithreading=True
+        use_multithreading=True,
     )
 
     print("📚 Loading documents...")
     documents = loader.load()
 
-    # Split documents into smaller chunks for processing
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=200
-    )
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     print("✂ Splitting documents into chunks...")
     texts = text_splitter.split_documents(documents)
 
-    # Create FAISS index from document chunks
     print("🧠 Building FAISS index... (This is the slow part)")
     db = FAISS.from_documents(texts, embeddings)
 
-    # Save newly created index for future use
     print(f"💾 Saving new index to {FAISS_INDEX_PATH}")
     db.save_local(FAISS_INDEX_PATH)
     print("✅ New FAISS index built and saved successfully!")
+    return db
+
+# --- Self-healing FAISS index loading ---
+try:
+    if os.path.exists(FAISS_INDEX_PATH) and os.listdir(FAISS_INDEX_PATH):
+        print("✅ Loading existing FAISS index from disk...")
+        db = FAISS.load_local(
+            FAISS_INDEX_PATH,
+            embeddings,
+            allow_dangerous_deserialization=True
+        )
+    else:
+        db = build_new_index()
+except Exception as e:
+    print(f"🔥 Error loading FAISS index: {e}. It might be corrupt or incompatible.")
+    print("🔥 Deleting old index and rebuilding...")
+    if os.path.exists(FAISS_INDEX_PATH):
+        shutil.rmtree(FAISS_INDEX_PATH)
+        os.makedirs(FAISS_INDEX_PATH, exist_ok=True) # Recreate the directory after deleting
+    db = build_new_index()
 
 
 
