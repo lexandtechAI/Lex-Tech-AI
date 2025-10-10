@@ -190,7 +190,7 @@ Answer as Lex & Tech AI:
 
 # ------------------ LLM Setup (using official Google library) ------------------
 genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
-llm = genai.GenerativeModel('gemini-1.5-flash')  # Using gemini-1.5-flash as it's the latest flash model
+llm = genai.GenerativeModel('gemini-1.5-pro-latest') # Using gemini-1.5-pro-latest as it's a powerful model
 
 
 # ------------------ Memory Store ------------------
